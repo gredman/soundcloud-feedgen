@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import datetime
+import pytz
 import sys
 
 from dateutil import parser
@@ -13,11 +15,14 @@ CLIENT_SECRET = environ['CLIENT_SECRET']
 USERNAME = environ['USERNAME']
 PASSWORD = environ['PASSWORD']
 
+MAX_AGE_DAYS=30
+
 client = Client(
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
         username=USERNAME,
         password=PASSWORD)
+now = datetime.datetime.now(pytz.utc)
 
 for set_url in sys.argv[1:]:
     fg = FeedGenerator()
@@ -40,11 +45,14 @@ for set_url in sys.argv[1:]:
         else:
             continue
 
+        date = parser.parse(track['last_modified'])
+        if (now - date).days > MAX_AGE_DAYS:
+            continue
+
         fe = fg.add_entry()
         fe.id(track['permalink_url'])
         fe.title(track['title'])
         fe.description(track['description'])
-        date = parser.parse(track['last_modified'])
         fe.published(date)
         resolved_url = client.get(url, allow_redirects=False)
         fe.enclosure(resolved_url.location, str(track['original_content_size']), 'audio/mpeg')

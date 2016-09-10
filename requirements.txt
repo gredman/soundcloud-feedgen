@@ -2,6 +2,7 @@ feedgen
 fudge
 lxml
 python-dateutil
+pytz
 requests
 simplejson
 six
