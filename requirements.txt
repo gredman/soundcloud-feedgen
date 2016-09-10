@@ -1,0 +1,9 @@
+feedgen
+fudge
+lxml
+python-dateutil
+requests
+simplejson
+six
+soundcloud
+wsgiref
