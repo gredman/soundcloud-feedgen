@@ -49,9 +49,7 @@ for set_url in sys.argv[1:]:
     fg.link(href=res.permalink_url, rel='alternate')
 
     for track in tracks:
-        if track.downloadable:
-            url = track.download_url
-        elif track.streamable:
+        if track.streamable:
             url = track.stream_url
         else:
             continue
