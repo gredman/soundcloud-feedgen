@@ -87,7 +87,7 @@ for set_url in sys.argv[1:]:
     fg.link(href=res.permalink_url, rel='alternate')
 
     for track in tracks:
-        date = parser.parse(track.last_modified)
+        date = parser.parse(track.created_at)
         if (now - date).days > MAX_AGE_DAYS:
             continue
 
