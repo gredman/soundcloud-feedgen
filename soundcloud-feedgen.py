@@ -83,7 +83,7 @@ for set_url in sys.argv[1:]:
 
     # print('🎧 ', res.permalink)
 
-    tracks = client.get(res.uri + '/tracks')
+    tracks = client.get(res.uri + '/tracks', limit=200)
     fg.link(href=res.permalink_url, rel='alternate')
 
     for track in tracks:
