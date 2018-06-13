@@ -11,6 +11,7 @@ import urllib
 
 from dateutil import parser
 from feedgen.feed import FeedGenerator
+from mimetypes import guess_type
 from soundcloud import Client
 
 OUTPUT_DIR = os.environ['OUTPUT_DIR']
@@ -27,14 +28,16 @@ MAX_AGE_DAYS = 7
 def download(track):
     if track.downloadable:
         url = track.download_url
+        file_name = track.permalink + '.' + track.original_format
     elif track.streamable:
         url = track.stream_url
+        file_name = track.permalink + '.mp3'
     else:
         return
 
     resolved_url = client.get(url, allow_redirects=False)
-    temp = os.path.join(TRACKS_DIR, track.permalink + '.download')
-    final = os.path.join(TRACKS_DIR, track.permalink)
+    temp = os.path.join(TRACKS_DIR, file_name + '.download')
+    final = os.path.join(TRACKS_DIR, file_name)
     
     if not os.path.exists(temp) and not os.path.exists(final):
         # print('🎵 ', track.permalink, end='')
@@ -48,6 +51,8 @@ def download(track):
                 os.remove(temp)
         # else:
         #     print(' 😊')
+
+    return file_name
 
 
 if not os.path.exists(TRACKS_DIR):
@@ -96,8 +101,9 @@ for set_url in sys.argv[1:]:
         fe.title(track.title)
         fe.description(track.description)
         fe.published(date)
-        download(track)
-        url = BASE_URL + '/tracks/' + track.permalink
-        fe.enclosure(url, str(track.original_content_size), 'audio/mpeg')
+        file_name = download(track)
+        url = BASE_URL + '/tracks/' + file_name
+        mime_type = guess_type(file_name)[0]
+        fe.enclosure(url, str(track.original_content_size), mime_type)
 
     fg.rss_file('%s/%s.xml' % (OUTPUT_DIR, res.permalink), pretty=True)
