@@ -6,6 +6,7 @@ from __future__ import print_function
 import datetime
 import os
 import pytz
+import re
 import sys
 import urllib
 
@@ -24,6 +25,18 @@ BASE_URL = os.environ['BASE_URL']
 TRACKS_DIR = os.path.join(OUTPUT_DIR, 'tracks')
 
 MAX_AGE_DAYS = 28
+
+# copied from https://github.com/html5lib/html5lib-python/issues/96#issuecomment-43438438
+def clean_xml(text):
+    def str_to_int(s, default, base=10):
+        if int(s, base) < 0x10000:
+            return unichr(int(s, base))
+        return default
+        
+    text = re.sub(ur"&#(\d+);?", lambda c: str_to_int(c.group(1), c.group(0)), text)
+    text = re.sub(ur"&#[xX]([0-9a-fA-F]+);?", lambda c: str_to_int(c.group(1), c.group(0), base=16), text)
+    text = re.sub(ur"[\x00-\x08\x0b\x0e-\x1f\x7f]", "", text)
+    return text
 
 def download(track):
     if track.downloadable:
@@ -97,7 +110,7 @@ for set_url in sys.argv[1:]:
         fe = fg.add_entry()
         fe.id(track.permalink_url)
         fe.title(track.title)
-        fe.description(track.description)
+        fe.description(clean_xml(track.description))
         fe.published(published_date)
 
         if (now - published_date).days < MAX_AGE_DAYS:
