@@ -4,6 +4,7 @@
 from __future__ import print_function
 
 import datetime
+import mimetypes
 import os
 import pytz
 import re
@@ -12,7 +13,6 @@ import urllib
 
 from dateutil import parser
 from feedgen.feed import FeedGenerator
-from mimetypes import guess_type
 from soundcloud import Client
 
 OUTPUT_DIR = os.environ['OUTPUT_DIR']
@@ -25,6 +25,8 @@ BASE_URL = os.environ['BASE_URL']
 TRACKS_DIR = os.path.join(OUTPUT_DIR, 'tracks')
 
 MAX_AGE_DAYS = 28
+
+mimetypes.add_type('audio/mp4', '.m4a')
 
 # copied from https://github.com/html5lib/html5lib-python/issues/96#issuecomment-43438438
 def clean_xml(text):
@@ -116,7 +118,7 @@ for set_url in sys.argv[1:]:
         if (now - published_date).days < MAX_AGE_DAYS:
             file_name = download(track)
             url = BASE_URL + '/tracks/' + file_name
-            mime_type = guess_type(file_name)[0]
+            mime_type = mimetypes.guess_type(file_name)[0]
         else:
             url = 'about:blank'
             mime_type = 'text/plain'
