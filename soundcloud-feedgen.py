@@ -24,7 +24,7 @@ BASE_URL = os.environ['BASE_URL']
 
 TRACKS_DIR = os.path.join(OUTPUT_DIR, 'tracks')
 
-MAX_AGE_DAYS = 28
+MAX_AGE_DAYS = 7
 
 mimetypes.add_type('audio/mp4', '.m4a')
 
@@ -107,22 +107,18 @@ for set_url in sys.argv[1:]:
     fg.link(href=res.permalink_url, rel='alternate')
 
     for track in tracks:
-        published_date = parser.parse(track.created_at)
+        date = parser.parse(track.created_at)
+        if (now - date).days > MAX_AGE_DAYS:
+            continue
 
         fe = fg.add_entry()
         fe.id(track.permalink_url)
         fe.title(track.title)
         fe.description(clean_xml(track.description))
-        fe.published(published_date)
-
-        if (now - published_date).days < MAX_AGE_DAYS:
-            file_name = download(track)
-            url = BASE_URL + '/tracks/' + file_name
-            mime_type = mimetypes.guess_type(file_name)[0]
-        else:
-            url = 'about:blank'
-            mime_type = 'text/plain'
-
+        fe.published(date)
+        file_name = download(track)
+        url = BASE_URL + '/tracks/' + file_name
+        mime_type = mimetypes.guess_type(file_name)[0]
         fe.enclosure(url, str(track.original_content_size), mime_type)
 
     fg.rss_file('%s/%s.xml' % (OUTPUT_DIR, res.permalink), pretty=True)
