@@ -111,12 +111,15 @@ for set_url in sys.argv[1:]:
         if (now - date).days > MAX_AGE_DAYS:
             continue
 
+        file_name = download(track)
+        if not file_name:
+            continue
+
         fe = fg.add_entry()
         fe.id(track.permalink_url)
         fe.title(track.title)
         fe.description(clean_xml(track.description))
         fe.published(date)
-        file_name = download(track)
         url = BASE_URL + '/tracks/' + file_name
         mime_type = mimetypes.guess_type(file_name)[0]
         fe.enclosure(url, str(track.original_content_size), mime_type)
