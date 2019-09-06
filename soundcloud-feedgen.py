@@ -35,6 +35,9 @@ def clean_xml(text):
             return unichr(int(s, base))
         return default
         
+    if text == None:
+        return text
+
     text = re.sub(ur"&#(\d+);?", lambda c: str_to_int(c.group(1), c.group(0)), text)
     text = re.sub(ur"&#[xX]([0-9a-fA-F]+);?", lambda c: str_to_int(c.group(1), c.group(0), base=16), text)
     text = re.sub(ur"[\x00-\x08\x0b\x0e-\x1f\x7f]", "", text)
