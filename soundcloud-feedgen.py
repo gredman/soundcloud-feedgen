@@ -60,11 +60,12 @@ def download(track):
     if not os.path.exists(temp) and not os.path.exists(final):
         # print('🎵 ', track.permalink, end='')
         try:
-            urllib.urlretrieve(resolved_url.location, temp)
+            urllib.urlretrieve(resolved_url.url, temp)
             os.rename(temp, final)
         except Exception as err:
             print(' 😟')
-            print(err)
+            print('error retrieving resolved url %s' % resolved_url)
+            print('retrieving url %s' % resolved_url.url)
             if os.path.exists(temp):
                 os.remove(temp)
         # else:
