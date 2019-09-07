@@ -88,7 +88,11 @@ for set_url in sys.argv[1:]:
     fg = FeedGenerator()
     fg.load_extension('podcast', atom=True, rss=True)
 
-    res = client.get('/resolve', url=set_url)
+    try:
+        res = client.get('/resolve', url=set_url)
+    except Exception as err:
+        print('error resolving url %s' % set_url)
+        continue
 
     fg.id(set_url)
 
